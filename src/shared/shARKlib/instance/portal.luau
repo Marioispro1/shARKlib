@@ -1,10 +1,4 @@
 --!strict
---[[
-    portal.luau
-    Render children into an arbitrary target instance instead of the
-    enclosing parent. Useful for tooltips, modals, etc.
-]]
-
 local apply   = require(script.Parent.apply)
 local Runtime = require(script.Parent.Parent.core.runtime)
 

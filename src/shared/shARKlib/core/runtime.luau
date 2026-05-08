@@ -1,15 +1,4 @@
 --!strict
---[[
-    runtime.luau
-    Shared mutable runtime state for the shARKlib reactive system.
-
-    shARKlib uses a push-based reactive graph. Reading a tracked value
-    while a "scope" (effect / derive) is active registers that scope as
-    a dependent. Writing a source enqueues all dependents into the
-    global update queue; the queue is drained immediately or, when
-    inside a `batch`, at the outermost batch boundary.
-]]
-
 export type CleanupFn = () -> ()
 
 export type Node = {
@@ -21,7 +10,7 @@ export type Node = {
     observers: { Node },              -- nodes that read this node
     children: { Node },               -- scopes created while this node was the owner
     cleanups: { CleanupFn },          -- callbacks run on re-evaluation / disposal
-    handlers: { (any) -> () }?,       -- error handlers (errorBoundary)
+    handlers: { (any) -> () }?,       -- error handlers (errorboundary)
     context: { [any]: any }?,         -- scoped context map
     priority: number,                 -- update priority; lower runs first
     state: number,                    -- 0 clean, 1 dirty, 2 disposed

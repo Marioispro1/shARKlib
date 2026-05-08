@@ -1,14 +1,4 @@
 --!strict
---[[
-    debounce.luau
-    Wraps a source so reads see the latest value, but downstream
-    observers are only notified after `delay` seconds of quiet.
-
-        local query = sh.source("")
-        local debounced = sh.debounce(query, 0.25)
-        sh.effect(function() runSearch(debounced()) end)
-]]
-
 local Runtime = require(script.Parent.Parent.core.runtime)
 local source  = require(script.Parent.Parent.core.source)
 local Graph   = require(script.Parent.Parent.core.graph)

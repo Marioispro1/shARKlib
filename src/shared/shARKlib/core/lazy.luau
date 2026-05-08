@@ -1,10 +1,4 @@
 --!strict
---[[
-    lazy.luau
-    Defer the construction of a component until the first time it is
-    rendered. Useful for splitting initialization cost.
-]]
-
 local function lazy<T>(loader: () -> (() -> T)): () -> T
     local component: (() -> T)? = nil
     return function()

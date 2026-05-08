@@ -1,9 +1,4 @@
 --!strict
---[[
-    untrack.luau
-    Run `fn` without subscribing to any source it reads.
-]]
-
 local Runtime = require(script.Parent.runtime)
 
 local function untrack<T>(fn: () -> T): T

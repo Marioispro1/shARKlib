@@ -1,15 +1,4 @@
 --!strict
---[[
-    spring.luau
-    Animated source driven by a critically-/under-damped harmonic
-    oscillator. Accepts a target source and returns a source that
-    smoothly tracks it. Supports number, Vector2, Vector3, Color3,
-    UDim, and UDim2 via component-wise integration.
-
-    Optimization: a single shared RunService heartbeat drives every
-    active spring, avoiding per-spring connections and allocations.
-]]
-
 local RunService = game:GetService("RunService")
 
 local Graph = require(script.Parent.Parent.core.graph)
@@ -104,7 +93,7 @@ local function step(dt: number)
 				local v = e.velocity[c]
 				local dx = x - e.target[c]
 
-				-- semi-implicit Euler with analytic spring force
+				-- semi-implicit euler with analytic spring force
 				local accel = -2 * zeta * omega * v - omega * omega * dx
 				v = v + accel * dt
 				x = x + v * dt

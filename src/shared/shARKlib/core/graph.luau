@@ -1,10 +1,4 @@
 --!strict
---[[
-    graph.luau
-    Reactive graph primitives: node creation, read/write tracking,
-    re-evaluation, error propagation, disposal, and queue flushing.
-]]
-
 local Runtime = require(script.Parent.runtime)
 
 type Node = Runtime.Node
@@ -16,7 +10,7 @@ local function defaultEquals(a: any, b: any): boolean
 end
 
 ----------------------------------------------------------------------
--- Node lifecycle
+-- node lifecycle
 ----------------------------------------------------------------------
 
 function Graph.createNode(fn: ((...any) -> any)?, value: any, equals: ((any, any) -> boolean)?): Node
@@ -107,10 +101,10 @@ end
 Graph.disposeChildren = disposeChildren
 
 ----------------------------------------------------------------------
--- Reading / writing
+-- reading / writing
 ----------------------------------------------------------------------
 
--- Register a dependency from the current scope to `node`.
+-- register a dependency from the current scope to `node`.
 function Graph.track(node: Node)
 	local cur = Runtime.current
 	if cur and not Runtime.untracked and cur.state ~= Runtime.STATE_DISPOSED then
@@ -121,13 +115,13 @@ function Graph.track(node: Node)
 	end
 end
 
--- Read a node's cached value, subscribing the active scope.
+-- read a node's cached value, subscribing the active scope.
 function Graph.read(node: Node): any
 	Graph.track(node)
 	return node.value
 end
 
--- Push `node` onto the pending queue (deduplicated).
+-- push `node` onto the pending queue (deduplicated).
 local function enqueue(node: Node)
 	if node.state == Runtime.STATE_DISPOSED then
 		return
@@ -141,7 +135,7 @@ end
 
 local flushQueue -- forward decl
 
--- Re-evaluate a node's `fn`, capturing fresh dependencies, and
+-- re-evaluate a node's `fn`, capturing fresh dependencies, and
 -- propagate the new value to observers if it changed.
 function Graph.run(node: Node)
 	if node.state == Runtime.STATE_DISPOSED then
@@ -204,7 +198,7 @@ function Graph.run(node: Node)
 	end
 end
 
--- Write a value to a source node and propagate to observers.
+-- write a value to a source node and propagate to observers.
 function Graph.write(node: Node, value: any)
 	if node.state == Runtime.STATE_DISPOSED then
 		return value
@@ -229,7 +223,7 @@ function Graph.write(node: Node, value: any)
 end
 
 ----------------------------------------------------------------------
--- Error propagation (used by errorBoundary)
+-- error propagation (used by errorboundary)
 ----------------------------------------------------------------------
 
 function Graph.throw(node: Node, err: any)
@@ -251,7 +245,7 @@ function Graph.throw(node: Node, err: any)
 end
 
 ----------------------------------------------------------------------
--- Queue flushing
+-- queue flushing
 ----------------------------------------------------------------------
 
 local function priorityCmp(a: Node, b: Node): boolean
@@ -259,8 +253,8 @@ local function priorityCmp(a: Node, b: Node): boolean
 end
 
 function flushQueue()
-	-- Drain Runtime.queue iteratively. Running a node may enqueue more
-	-- observers, so we re-fetch Runtime.queue each pass and replace it
+	-- drain runtime.queue iteratively. running a node may enqueue more
+	-- observers, so we re-fetch runtime.queue each pass and replace it
 	-- with a fresh table before processing the current batch.
 	local queued = Runtime.queued
 	local guard = 0

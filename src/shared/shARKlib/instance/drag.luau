@@ -1,17 +1,4 @@
 --!strict
---[[
-    drag.luau
-    Make a GuiObject draggable. Returns `(action, positionSource)`
-    where the source tracks the GuiObject's `Position` (UDim2) as it
-    is dragged.
-
-        local d, pos = sh.drag()
-        sh.create("Frame") {
-            Position = pos, -- bind to Position so the move sticks
-            d,
-        }
-]]
-
 local UserInputService = game:GetService("UserInputService")
 
 local Runtime = require(script.Parent.Parent.core.runtime)

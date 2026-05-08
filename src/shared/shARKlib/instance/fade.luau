@@ -1,19 +1,4 @@
 --!strict
---[[
-    fade.luau
-    Action that fades a GuiObject's transparency in on mount and out
-    on cleanup. Useful for entry/exit animations.
-
-        sh.create("Frame") {
-            sh.fade { duration = 0.2 },
-            ...
-        }
-
-    `propertyMap` lets you override which transparency-style properties
-    to animate. By default: BackgroundTransparency, TextTransparency,
-    ImageTransparency — whichever the instance actually has.
-]]
-
 local TweenService = game:GetService("TweenService")
 
 local Runtime = require(script.Parent.Parent.core.runtime)

@@ -1,10 +1,4 @@
 --!strict
---[[
-    tween.luau
-    Animate a source toward a target using Roblox's TweenService
-    easing curves. Returns a source that tracks the interpolated value.
-]]
-
 local RunService    = game:GetService("RunService")
 local TweenService  = game:GetService("TweenService")
 

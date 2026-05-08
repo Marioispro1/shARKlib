@@ -1,11 +1,4 @@
 --!strict
---[[
-    defaults.luau
-    Default property overrides applied to instances created via
-    `create(className)` so newly created GUI elements aren't loudly
-    styled by Roblox's stock defaults (borders, transparent text, etc).
-]]
-
 local defaults: { [string]: { [string]: any } } = {
 	ScreenGui = {
 		ResetOnSpawn = false,

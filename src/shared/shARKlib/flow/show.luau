@@ -1,11 +1,4 @@
 --!strict
---[[
-    show.luau
-    Conditionally renders a component based on a boolean source. The
-    component re-runs only when the truthiness of `cond` changes (so
-    children are not destroyed for unrelated state changes).
-]]
-
 local derive = require(script.Parent.Parent.core.derive)
 local Graph = require(script.Parent.Parent.core.graph)
 

@@ -1,17 +1,4 @@
 --!strict
---[[
-    apply.luau
-    Take an existing instance and a props table, then wire the props up:
-
-      * string keys      -> property assignment (reactive if a function)
-      * RBXScriptSignal  -> Connect with cleanup
-      * numeric children -> parent under the instance (recursive)
-      * `Children` key   -> shorthand list of children
-      * Action objects   -> deferred run after props are applied
-
-    Returns the same instance for chaining.
-]]
-
 local Runtime = require(script.Parent.Parent.core.runtime)
 local Graph = require(script.Parent.Parent.core.graph)
 
@@ -75,8 +62,8 @@ function addChild(parent: Instance, child: any)
 			addChildren(parent, child :: { any })
 		end
 	elseif t == "function" then
-		-- dynamic child: a getter returning Instance | {Instance} | nil.
-		-- Re-evaluates and re-parents on every change, cleaning up the
+		-- dynamic child: a getter returning instance | {instance} | nil.
+		-- re-evaluates and re-parents on every change, cleaning up the
 		-- previous result.
 		local last: { Instance } = {}
 		local node = Graph.createNode(function()
@@ -85,7 +72,7 @@ function addChild(parent: Instance, child: any)
 				return nil
 			end
 
-			-- Build the next set of instances (preserving order).
+			-- build the next set of instances (preserving order).
 			local nextList: { Instance } = {}
 			if typeof(value) == "Instance" then
 				table.insert(nextList, value)
@@ -97,9 +84,9 @@ function addChild(parent: Instance, child: any)
 				end
 			end
 
-			-- Diff: only unparent instances that are gone from `next`.
-			-- This keeps existing children attached so observers like
-			-- smoothLayout don't see spurious ChildRemoved/ChildAdded.
+			-- diff: only unparent instances that are gone from `next`.
+			-- this keeps existing children attached so observers like
+			-- smoothlayout don't see spurious childremoved/childadded.
 			local nextSet: { [Instance]: true } = {}
 			for _, inst in ipairs(nextList) do
 				nextSet[inst] = true
@@ -111,8 +98,8 @@ function addChild(parent: Instance, child: any)
 				end
 			end
 
-			-- Parent any new ones; existing ones already have correct
-			-- Parent so we leave them be (this avoids the property
+			-- parent any new ones; existing ones already have correct
+			-- parent so we leave them be (this avoids the property
 			-- write-back which would also fire signals).
 			for _, inst in ipairs(nextList) do
 				if inst.Parent ~= parent then
@@ -156,10 +143,10 @@ local function apply(instance: Instance, props: { [any]: any }): Instance
 		elseif typeof(key) == "RBXScriptSignal" then
 			bindEvent(instance, key, value)
 		end
-		-- numeric keys and CHILDREN_KEY fall through to pass 2
+		-- numeric keys and children_key fall through to pass 2
 	end
 
-	-- 2) children (numeric keys + Children sentinel)
+	-- 2) children (numeric keys + children sentinel)
 	for _, value in ipairs(props) do
 		if isAction(value) then
 			actions = actions or {}

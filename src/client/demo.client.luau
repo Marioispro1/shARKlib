@@ -1,9 +1,4 @@
 --!strict
---[[
-    Demo: a counter, an animated bar, and a list — to exercise core
-    reactive primitives, the spring animator, and `values` keyed lists.
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -97,7 +92,7 @@ sh.mount(function()
 				sh.create("UICorner")({ CornerRadius = UDim.new(0, 6) }),
 			}),
 
-			-- keyed list: re-uses TextLabels across reorderings
+			-- keyed list: re-uses textlabels across reorderings
 			sh.create("Frame")({
 				Size = UDim2.new(1, 0, 0, 90),
 				BackgroundTransparency = 1,

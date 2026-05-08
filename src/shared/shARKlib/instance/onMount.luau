@@ -1,17 +1,4 @@
 --!strict
---[[
-    onMount.luau
-    Action that runs `fn(instance)` once, on the next frame after the
-    instance is parented into the live UI tree. Useful for layout that
-    requires the instance to have a real `AbsoluteSize`/`AbsolutePosition`.
-
-        sh.create("Frame") {
-            sh.onMount(function(frame)
-                print("size:", frame.AbsoluteSize)
-            end),
-        }
-]]
-
 local RunService = game:GetService("RunService")
 
 local Runtime = require(script.Parent.Parent.core.runtime)

@@ -1,15 +1,4 @@
 --!strict
---[[
-    store.luau
-    A deeply-reactive table. Reading any nested field while in a
-    tracking scope subscribes to that exact path. Writes via
-    `store:set(path, value)` only notify subscribers of changed paths.
-
-        local s = store({ user = { name = "Ada", age = 30 } })
-        effect(function() print(s.user.name) end)
-        s:set({ "user", "name" }, "Grace") -- only the print re-runs
-]]
-
 local Graph   = require(script.Parent.Parent.core.graph)
 local Runtime = require(script.Parent.Parent.core.runtime)
 

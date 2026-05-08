@@ -1,12 +1,4 @@
 --!strict
---[[
-    keybind.luau
-    Bind a keyboard key to a callback. Cleans up automatically.
-
-        sh.keybind(Enum.KeyCode.E, function() print("E pressed") end)
-        sh.keybind(Enum.KeyCode.Escape, close, { gameProcessed = true })
-]]
-
 local UserInputService = game:GetService("UserInputService")
 
 local Runtime = require(script.Parent.Parent.core.runtime)

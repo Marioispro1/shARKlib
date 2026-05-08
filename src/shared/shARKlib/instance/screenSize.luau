@@ -1,16 +1,4 @@
 --!strict
---[[
-    screenSize.luau
-    A reactive source that mirrors `workspace.CurrentCamera.ViewportSize`.
-    Useful for media queries / responsive layouts.
-
-        local size = sh.screenSize()
-        local isMobile = sh.derive(function() return size().X < 700 end)
-
-    The source persists for the whole reactive session — i.e. shared
-    across calls within the same root.
-]]
-
 local source = require(script.Parent.Parent.core.source)
 local Runtime = require(script.Parent.Parent.core.runtime)
 

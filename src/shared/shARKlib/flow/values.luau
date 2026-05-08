@@ -1,11 +1,4 @@
 --!strict
---[[
-    values.luau
-    Render a list keyed by *value identity* (preserving rendered
-    instances when items are reordered). The component is invoked once
-    per unique value with a *source* yielding that item's index.
-]]
-
 local Graph = require(script.Parent.Parent.core.graph)
 local Runtime = require(script.Parent.Parent.core.runtime)
 local source = require(script.Parent.Parent.core.source)
@@ -31,9 +24,9 @@ local function values<T>(list: () -> { T }, component: (T, () -> number) -> any)
 					local destroy
 					root(function(d)
 						destroy = d
-						-- create the index source INSIDE the detached root
+						-- create the index source inside the detached root
 						-- so it isn't disposed when the outer values node
-						-- re-runs disposeChildren on itself.
+						-- re-runs disposechildren on itself.
 						idx = source(i)
 						rendered = component(item, idx)
 					end)

@@ -1,11 +1,4 @@
 --!strict
---[[
-    context.luau
-    Lightweight dependency injection scoped to the reactive ownership
-    tree. `context(default)` returns a getter; calling it reads the
-    nearest provided value via `provider:provide(value, fn)`.
-]]
-
 local Runtime = require(script.Parent.runtime)
 
 export type Context<T> = {

@@ -1,10 +1,4 @@
 --!strict
---[[
-    errorBoundary.luau
-    Catch errors thrown inside `try` and render `fallback(err, reset)`
-    instead. Calling `reset()` re-runs `try`.
-]]
-
 local Graph  = require(script.Parent.graph)
 local source = require(script.Parent.source)
 

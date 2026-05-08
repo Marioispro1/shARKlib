@@ -1,18 +1,4 @@
 --!strict
---[[
-    resource.luau
-    Asynchronous source. `resource(fetcher)` runs `fetcher()` in a
-    task; while pending the source returns nil and `loading()` is true.
-    On completion the value source is filled; on error `errorOf()`
-    returns the thrown value. Re-runs whenever a tracked dep changes.
-
-        local user, status = resource(function() return getUser(id()) end)
-        --   user()  -> User?
-        --   status.loading()  -> boolean
-        --   status.error()    -> any?
-        --   status.refetch()
-]]
-
 local Graph   = require(script.Parent.Parent.core.graph)
 local Runtime = require(script.Parent.Parent.core.runtime)
 local source  = require(script.Parent.Parent.core.source)

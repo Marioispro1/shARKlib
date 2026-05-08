@@ -1,11 +1,4 @@
 --!strict
---[[
-    pressed.luau
-    Like `hover`, but tracks whether the user is currently holding the
-    mouse button down on the target. Works on any GuiObject; uses
-    InputBegan/InputEnded so it covers MouseButton1 and Touch.
-]]
-
 local Runtime = require(script.Parent.Parent.core.runtime)
 local action  = require(script.Parent.action)
 local source  = require(script.Parent.Parent.core.source)

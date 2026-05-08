@@ -1,10 +1,4 @@
 --!strict
---[[
-    cleanup.luau
-    Register a callback to run when the enclosing scope is re-evaluated
-    or disposed. Outside of any scope this is a silent no-op (and warns).
-]]
-
 local Runtime = require(script.Parent.runtime)
 
 local function cleanup(fn: () -> ())

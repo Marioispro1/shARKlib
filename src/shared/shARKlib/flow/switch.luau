@@ -1,11 +1,4 @@
 --!strict
---[[
-    switch.luau
-    `switch(source) { [key] = component, ... }` selects exactly one
-    component per source value. Only re-renders when the key changes;
-    components are memoized per key so switching back is cheap.
-]]
-
 local Graph = require(script.Parent.Parent.core.graph)
 local derive = require(script.Parent.Parent.core.derive)
 

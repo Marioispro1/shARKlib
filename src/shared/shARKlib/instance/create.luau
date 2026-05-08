@@ -1,20 +1,4 @@
 --!strict
---[[
-    create.luau
-
-        create(class)              -> (props) -> Instance
-        create(class, templateName)-> (props) -> Instance
-        create(existingInstance)   -> (props) -> Instance  (clones it)
-
-    The two-arg form selects one of the named templates registered via
-    `shARKlib.SetTemplate(name, ...)`. The library's built-in defaults
-    and the unnamed user template are always layered first.
-
-    Performance: a per-(class, templateName) clone source is built once
-    and then `:Clone()`d for every call, so per-instance cost is just
-    the clone plus the user-supplied prop pass.
-]]
-
 local apply     = require(script.Parent.apply)
 local Templates = require(script.Parent.templates)
 

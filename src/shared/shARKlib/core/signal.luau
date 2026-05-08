@@ -1,17 +1,4 @@
 --!strict
---[[
-    signal.luau
-    A lightweight, allocation-free pub/sub primitive (think
-    `RBXScriptSignal` minus the engine plumbing). Use this for
-    cross-component events that aren't expressible as state.
-
-        local toast = signal()
-        toast:connect(function(message) ... end)
-        toast:fire("Saved!")
-
-    Disconnects bind to the enclosing reactive scope.
-]]
-
 local Runtime = require(script.Parent.runtime)
 
 export type Signal<T...> = {

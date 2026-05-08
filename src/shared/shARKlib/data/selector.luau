@@ -1,15 +1,4 @@
 --!strict
---[[
-    selector.luau
-    Efficient single-key selector for highlight-style UIs. Given a
-    source returning a "selected key", returns a function that, when
-    called with a candidate key, yields a *boolean source* that only
-    invalidates for the previously- and currently-selected keys.
-
-    Compared with `derive(function() return s() == k end)` in N rows,
-    this is O(1) updates instead of O(N).
-]]
-
 local Graph   = require(script.Parent.Parent.core.graph)
 local Runtime = require(script.Parent.Parent.core.runtime)
 local source  = require(script.Parent.Parent.core.source)

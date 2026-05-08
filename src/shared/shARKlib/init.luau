@@ -1,34 +1,4 @@
 --!strict
---[[
-    shARKlib
-    A reactive UI library for Roblox / Luau.
-
-    Layout:
-      core/       reactive primitives (source, derive, effect, ...)
-      instance/   instance authoring  (create, apply, mount, templates, ...)
-      flow/       control flow        (show, switch, match, indexes, values)
-      animation/  animation drivers   (spring, tween)
-      data/       async / data        (resource, store, selector)
-      tooling/    runtime hooks       (scheduler)
-
-    Usage:
-
-        local sh = require(path.to.shARKlib)
-
-        sh.SetTemplate({
-            Frame    = { BackgroundColor3 = Color3.fromRGB(20,20,24) },
-            TextLabel = { TextColor3 = Color3.fromRGB(235,235,240) },
-        })
-
-        sh.SetTemplate("primary", {
-            TextButton = { BackgroundColor3 = Color3.fromRGB(60,120,220) },
-        })
-
-        sh.Init() -- finalizes templates; required before any other API
-
-        sh.create("TextButton", "primary") { Text = "Go" }
-]]
-
 local apply = require(script.instance.apply)
 local Templates = require(script.instance.templates)
 
@@ -38,13 +8,13 @@ local M = {}
 -- bootstrap
 ----------------------------------------------------------------------
 
--- SetTemplate(map)        merges into the unnamed (default) template
--- SetTemplate(name, map)  merges into a named template
+-- settemplate(map)        merges into the unnamed (default) template
+-- settemplate(name, map)  merges into a named template
 function M.SetTemplate(arg1: any, arg2: any?)
 	Templates.set(arg1, arg2)
 end
 
--- Finalize templates and unlock the rest of the API.
+-- finalize templates and unlock the rest of the api.
 function M.Init()
 	Templates.init()
 end
@@ -176,7 +146,7 @@ M.apply = function(...)
 	requireInit()
 	return apply.apply(...)
 end
-M.Children = apply.Children -- safe to expose pre-Init
+M.Children = apply.Children -- safe to expose pre-init
 
 -- control flow
 M.show = wrap("show")

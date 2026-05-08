@@ -1,11 +1,4 @@
 --!strict
---[[
-    indexes.luau
-    Render a list keyed by index. The component is invoked once per
-    index with a *source* yielding the current value at that index, so
-    item identity follows position. Best when items are not reordered.
-]]
-
 local Graph = require(script.Parent.Parent.core.graph)
 local Runtime = require(script.Parent.Parent.core.runtime)
 local source = require(script.Parent.Parent.core.source)

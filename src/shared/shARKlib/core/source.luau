@@ -1,11 +1,4 @@
 --!strict
---[[
-    source.luau
-    A `source` is a callable reactive cell: invoke with no argument to
-    read (and subscribe), or with an argument to write. Pass an updater
-    function to compute a new value from the previous one.
-]]
-
 local Graph = require(script.Parent.graph)
 
 export type Source<T> = (T?) -> T

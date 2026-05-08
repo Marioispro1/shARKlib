@@ -1,12 +1,4 @@
 --!strict
---[[
-    mapList.luau
-    Reactively map over an array source, caching transformed values
-    per input identity (so unchanged items don't recompute).
-
-        local doubled = sh.mapList(numbers, function(n) return n * 2 end)
-]]
-
 local derive = require(script.Parent.Parent.core.derive)
 
 local function mapList<T, R>(list: () -> { T }, fn: (T, number) -> R): () -> { R }

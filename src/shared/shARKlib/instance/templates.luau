@@ -1,29 +1,4 @@
 --!strict
---[[
-    templates.luau
-    Holds user-supplied property templates for instances. There are
-    two layers per class:
-
-      * the "default" template      (used when no name is given)
-      * any number of named templates
-
-    The library's built-in defaults (see defaults.luau) are *always*
-    applied first; user templates are then layered on top.
-
-        shARKlib.SetTemplate({
-            Frame = { BackgroundColor3 = Color3.fromRGB(20,20,24) },
-        })
-
-        shARKlib.SetTemplate("primary", {
-            TextButton = { BackgroundColor3 = Color3.fromRGB(60,120,220) },
-        })
-
-        shARKlib.create("TextButton", "primary") { Text = "Go" }
-
-    `Init()` freezes the current set of templates and pre-builds clone
-    sources to make `create()` allocation-free at the property pass.
-]]
-
 local builtin = require(script.Parent.defaults)
 
 local Templates = {}
@@ -48,8 +23,8 @@ local function clearCache()
     table.clear(Templates.cache)
 end
 
--- Public: SetTemplate(map) or SetTemplate(name, map).
--- `map` is `{ [className] = propsTable }`. Subsequent calls merge
+-- public: settemplate(map) or settemplate(name, map).
+-- `map` is `{ [classname] = propstable }`. subsequent calls merge
 -- on top of any previous templates of the same name.
 function Templates.set(arg1: any, arg2: any?)
     if Templates.initialized then
@@ -92,14 +67,14 @@ function Templates.set(arg1: any, arg2: any?)
         end
     end
 
-    -- mutating templates after Init is forbidden, so we don't need to
-    -- invalidate the cache here; if Init has not yet been called the
+    -- mutating templates after init is forbidden, so we don't need to
+    -- invalidate the cache here; if init has not yet been called the
     -- cache is empty anyway.
     clearCache()
 end
 
--- Build (and cache) a fresh "template" Instance for `class`/`name`.
--- The instance has built-in defaults + user default template + named
+-- build (and cache) a fresh "template" instance for `class`/`name`.
+-- the instance has built-in defaults + user default template + named
 -- template applied. `create()` clones it then layers per-call props.
 function Templates.resolve(class: string, name: string?): Instance
     local key = if name then class .. "::" .. name else class
@@ -130,7 +105,7 @@ function Templates.resolve(class: string, name: string?): Instance
     return instance
 end
 
--- Pre-warm the cache for every (class, name?) registered.
+-- pre-warm the cache for every (class, name?) registered.
 function Templates.init()
     if Templates.initialized then
         warn("[shARKlib] Init() called twice; ignoring")

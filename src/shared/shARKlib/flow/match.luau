@@ -1,14 +1,4 @@
 --!strict
---[[
-    match.luau
-    Like `switch` but matches via predicates rather than equality.
-
-        match(state) {
-            { function(s) return s.kind == "loading" end, Loading },
-            { function(s) return s.kind == "ready"   end, Ready   },
-        }
-]]
-
 local Graph = require(script.Parent.Parent.core.graph)
 
 local function match<T>(source: () -> T)

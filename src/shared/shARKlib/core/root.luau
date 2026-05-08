@@ -1,18 +1,11 @@
 --!strict
---[[
-    root.luau
-    Creates a top-level reactive scope detached from any tracking
-    parent. Returns whatever the user function returns plus a
-    `destroy` callback that disposes everything created inside.
-]]
-
 local Graph = require(script.Parent.graph)
 local Runtime = require(script.Parent.runtime)
 
 local function root<T...>(fn: (destroy: () -> ()) -> T...): T...
 	local node = Graph.createNode(nil, nil)
-	-- Detach from any ambient owner. createNode already inserted us
-	-- into Runtime.owner.children, so remove that entry too — otherwise
+	-- detach from any ambient owner. createnode already inserted us
+	-- into runtime.owner.children, so remove that entry too — otherwise
 	-- when the outer scope re-evaluates it would dispose us along with
 	-- its real children.
 	if node.owner then

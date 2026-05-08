@@ -1,14 +1,4 @@
 --!strict
---[[
-    combine.luau
-    Combine N sources into one derived value:
-
-        local pos = sh.combine(x, y, function(xv, yv) return Vector2.new(xv, yv) end)
-
-    Equivalent to `derive(function() return fn(a(), b(), ...) end)` but
-    a touch friendlier as a one-liner. Last argument is the combiner.
-]]
-
 local derive = require(script.Parent.Parent.core.derive)
 
 local function combine(...): any

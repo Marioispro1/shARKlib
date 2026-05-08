@@ -1,15 +1,4 @@
 --!strict
---[[
-    onEvent.luau
-    Attach a connection to an arbitrary RBXScriptSignal property of an
-    instance using a string name. Convenient when the property name
-    isn't statically known, or when you want a self-cleaning handler:
-
-        sh.create("Part") {
-            sh.onEvent("Touched", function(other) ... end),
-        }
-]]
-
 local Runtime = require(script.Parent.Parent.core.runtime)
 local action  = require(script.Parent.action)
 

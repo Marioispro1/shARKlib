@@ -1,12 +1,4 @@
 --!strict
---[[
-    changed.luau
-    Returns an action that, when applied to an instance, mirrors a
-    property's value into a callback (or source) on every change.
-
-        apply(textBox, { Text = "", changed("Text", textSource) })
-]]
-
 local action = require(script.Parent.action)
 
 local function changed(property: string, callback: (any) -> ())

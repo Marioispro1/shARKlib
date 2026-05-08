@@ -1,10 +1,4 @@
 --!strict
---[[
-    batch.luau
-    Defer queue flushing until the outermost batch returns. Useful when
-    writing several sources that would otherwise each trigger a flush.
-]]
-
 local Runtime = require(script.Parent.runtime)
 local Graph   = require(script.Parent.graph)
 

@@ -1,10 +1,4 @@
 --!strict
---[[
-    tag.luau
-    Returns an action that adds a CollectionService tag to an instance,
-    cleaning it up on disposal.
-]]
-
 local CollectionService = game:GetService("CollectionService")
 local action  = require(script.Parent.action)
 local Runtime = require(script.Parent.Parent.core.runtime)

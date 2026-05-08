@@ -1,13 +1,4 @@
 --!strict
---[[
-    scheduler.luau
-    Public hooks into the runtime scheduler:
-      * setStrict(bool)    - re-run effects twice for debug
-      * setOnError(fn)     - global uncaught error handler
-      * flushSync()        - flush pending updates immediately
-      * setDevtools(hooks) - register devtools observer
-]]
-
 local Runtime = require(script.Parent.Parent.core.runtime)
 local Graph   = require(script.Parent.Parent.core.graph)
 

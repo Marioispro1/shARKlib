@@ -1,10 +1,4 @@
 --!strict
---[[
-    throttle.luau
-    Like `debounce`, but emits the *first* change immediately and then
-    coalesces further changes within `interval` seconds.
-]]
-
 local Runtime = require(script.Parent.Parent.core.runtime)
 local source  = require(script.Parent.Parent.core.source)
 local Graph   = require(script.Parent.Parent.core.graph)

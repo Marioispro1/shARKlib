@@ -1,31 +1,4 @@
 --!strict
---[[
-    smoothLayout.luau
-    A drop-in replacement for `UIListLayout` that springs each child
-    toward its target slot instead of snapping. Use it like a normal
-    layout child:
-
-        sh.create("Frame") {
-            sh.smoothLayout {
-                FillDirection = Enum.FillDirection.Vertical,
-                Padding       = UDim.new(0, 6),
-                SortOrder     = Enum.SortOrder.LayoutOrder,
-            },
-            ...children...
-        }
-
-    Optional second arg overrides spring params:
-        sh.smoothLayout(opts, { period = 0.35, damping = 0.85 })
-
-    Notes
-      * Children are positioned with `Position = UDim2.fromOffset(x, y)`
-        so don't also bind `Position` to a source.
-      * `Size` of children is read each frame; UI components that
-        change size dynamically work out of the box.
-      * Re-layouts happen on ChildAdded / ChildRemoved /
-        LayoutOrder change / Size change / Visible change.
-]]
-
 local RunService = game:GetService("RunService")
 
 local Runtime = require(script.Parent.Parent.core.runtime)

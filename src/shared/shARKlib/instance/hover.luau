@@ -1,16 +1,4 @@
 --!strict
---[[
-    hover.luau
-    Returns an `(action, source)` pair: the action wires the action
-    target's `MouseEnter`/`MouseLeave` to a boolean source you read.
-
-        local h, hovering = sh.hover()
-        sh.create("Frame") {
-            BackgroundColor3 = function() return hovering() and accent or base end,
-            h,
-        }
-]]
-
 local Runtime = require(script.Parent.Parent.core.runtime)
 local action  = require(script.Parent.action)
 local source  = require(script.Parent.Parent.core.source)
