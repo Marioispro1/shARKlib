@@ -2,7 +2,7 @@
 
 A reactive UI library for Roblox. You write functions that return Frames, the library tracks which parts of those Frames depend on which pieces of state, and it updates only those parts when the state changes.
 
-Docs: [https://&lt;marioispro1&gt;.github.io/shARKlib/](#) (set up GitHub Pages from the `/docs` folder)
+Docs: [https://marioispro1.github.io/shARKlib/](#) (set up GitHub Pages from the `/docs` folder)
 
 ```lua
 local sh = require(ReplicatedStorage.shARKlib)
