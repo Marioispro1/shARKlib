@@ -98,6 +98,14 @@ function updateActive() {
   });
 }
 
+function setActive(target) {
+  links.forEach((a) => a.classList.toggle("active", a === target));
+}
+
+links.forEach((a) => {
+  a.addEventListener("click", () => setActive(a));
+});
+
 updateActive();
 window.addEventListener("hashchange", updateActive);
 window.addEventListener("popstate", updateActive);
