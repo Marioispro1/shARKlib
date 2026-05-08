@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>shARKlib · reactive UI for Roblox</title>
+<meta name="description" content="A small reactive UI library for Roblox." />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/400.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/600.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.0.20/400.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="wrap">
+<div id="sidebar-mount"></div>
+
+<main>
+  <section id="intro">
+    <h1>shARKlib</h1>
+    <p class="lede">A reactive UI library for Roblox. You write functions that return Frames, the library tracks which parts of those Frames depend on which pieces of state, and it updates only those parts when the state changes.</p>
+    <div class="badges">
+      <span class="badge green">Stable</span>
+      <span class="badge">Luau</span>
+      <span class="badge">Roblox</span>
+    </div>
+
+    <p>Components are just functions:</p>
+<pre><code class="language-lua">local function Counter()
+  local count = sh.source(0)
+  return sh.create("TextButton") {
+    Text = function() return "clicks: " .. count() end,
+    Activated = function() count(count() + 1) end,
+  }
+end</code></pre>
+
+    <p>It also ships with derived values, effects, error boundaries, context, control flow helpers (<code>show</code>, <code>switch</code>, <code>values</code>), springs and tweens, a smooth animated layout, and a templating system for property defaults.</p>
+  </section>
+
+  <hr/>
+
+  <section id="install">
+    <h2>Installation</h2>
+    <p>The simplest option is the prebuilt model:</p>
+    <ol>
+      <li>Download <code>shARKlib.rbxm</code> from releases.</li>
+      <li>In Studio, right-click <code>ReplicatedStorage</code> and pick <em>Insert from File…</em>.</li>
+      <li>Require it:</li>
+    </ol>
+<pre><code class="language-lua">local sh = require(path.to.shARKlib)</code></pre>
+
+    <p>To vendor the source instead, the layout under <code>src/shared/shARKlib</code> is:</p>
+<pre><code>shARKlib/
+├── init.luau            -- public API + SetTemplate / Init
+├── core/                -- reactive primitives
+├── instance/            -- create, apply, mount, actions, helpers
+├── flow/                -- show, switch, match, indexes, values
+├── animation/           -- spring, tween
+├── data/                -- resource, store, selector, debounce, ...
+└── tooling/             -- scheduler hooks</code></pre>
+
+    <p>To build the rbxm yourself with Rojo:</p>
+<pre><code class="language-bash">rojo build shARKlib.project.json -o shARKlib.rbxm</code></pre>
+  </section>
+
+  <section id="quickstart">
+    <h2>Quick start</h2>
+    <p>A counter with an animated progress bar:</p>
+<pre><code class="language-lua">local sh = require(ReplicatedStorage.shARKlib)
+
+-- 1. register templates BEFORE Init()
+sh.SetTemplate({
+  Frame     = { BackgroundColor3 = Color3.fromRGB(28, 28, 32) },
+  TextLabel = { TextColor3 = Color3.fromRGB(235, 235, 240) },
+})
+sh.SetTemplate("primary", {
+  TextButton = { BackgroundColor3 = Color3.fromRGB(90, 130, 220) },
+})
+
+sh.Init() -- finalize templates, unlock the rest of the API
+
+-- 2. mount your component
+sh.mount(function()
+  local count = sh.source(0)
+  local progress = sh.spring(function()
+    return UDim2.fromScale(math.min(count() / 10, 1), 1)
+  end, 0.4, 0.7)
+
+  return sh.create("ScreenGui") {
+    sh.create("Frame") {
+      Size = UDim2.fromOffset(280, 120),
+      Position = UDim2.fromScale(0.5, 0.5),
+      AnchorPoint = Vector2.new(0.5, 0.5),
+
+      sh.create("TextLabel") {
+        Size = UDim2.fromScale(1, 0.5),
+        Text = function() return "count = " .. count() end,
+      },
+
+      sh.create("TextButton", "primary") {
+        Size = UDim2.new(1, 0, 0.5, 0),
+        Position = UDim2.fromScale(0, 0.5),
+        Text = "Increment",
+        Activated = function() count(count() + 1) end,
+      },
+    },
+  }
+end, Players.LocalPlayer.PlayerGui)</code></pre>
+  </section>
+
+  <section id="concepts">
+    <h2>Concepts</h2>
+
+    <h3>The reactive graph</h3>
+    <p>There are three primitives:</p>
+    <div class="grid-cards">
+      <div class="card"><h4>source</h4><p>A mutable cell. Call with no args to read, with one to write.</p></div>
+      <div class="card"><h4>derive</h4><p>A cached computation. Re-runs when a dependency changes.</p></div>
+      <div class="card"><h4>effect</h4><p>A side effect. Runs once now, and again whenever a source it reads changes.</p></div>
+    </div>
+    <p>Reading a source inside a <code>derive</code> or <code>effect</code> automatically subscribes that scope to the source. Writing the source re-runs the scopes that read it. You don't subscribe or unsubscribe manually.</p>
+
+    <h3>Templates and Init</h3>
+    <p><code>SetTemplate</code> registers property defaults per class so you don't repeat them on every instance. The first form sets the unnamed default. The second registers a named variant you can pick later with <code>create(class, name)</code>.</p>
+<pre><code class="language-lua">sh.SetTemplate({ Frame = { BackgroundColor3 = bg } })
+sh.SetTemplate("primary", { TextButton = { BackgroundColor3 = blue } })</code></pre>
+    <p>Multiple calls merge. Later writes override earlier ones for the same key. After registering everything, call <code>sh.Init()</code>. It freezes the templates, builds clone sources for each class, and unlocks the rest of the API. Calling anything else before Init is an error. Calling SetTemplate after Init is also an error.</p>
+
+    <h3>Cleanup</h3>
+    <p>Every effect, derive, and component runs inside an owner scope. When the scope is disposed (because something higher up re-evaluated, or because you called the destroy callback from <code>root</code> or <code>mount</code>) its children are disposed too, its cleanup callbacks run, and any events it connected get disconnected. You rarely need to write cleanup code yourself.</p>
+
+    <h3>Component pattern</h3>
+    <p>A component is a function that returns an Instance. Local state is a closure over a <code>source</code>:</p>
+<pre><code class="language-lua">local function Button(props)
+  local hAct, hovering = sh.hover()
+  return sh.create("TextButton", "primary") {
+    Text = props.label,
+    Activated = props.onClick,
+    BackgroundTransparency = function()
+      return hovering() and 0.1 or 0
+    end,
+    hAct,
+  }
+end</code></pre>
+
+    <p style="margin-top: 32px;"><a href="api.html">Continue to the API reference &rarr;</a></p>
+  </section>
+</main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/lua.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/bash.min.js"></script>
+<script>hljs.registerLanguage("lua", window.hljsDefineLua || hljs.getLanguage("lua"));</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

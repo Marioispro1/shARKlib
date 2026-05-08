@@ -1,0 +1,30 @@
+--!strict
+--[[
+    combine.luau
+    Combine N sources into one derived value:
+
+        local pos = sh.combine(x, y, function(xv, yv) return Vector2.new(xv, yv) end)
+
+    Equivalent to `derive(function() return fn(a(), b(), ...) end)` but
+    a touch friendlier as a one-liner. Last argument is the combiner.
+]]
+
+local derive = require(script.Parent.Parent.core.derive)
+
+local function combine(...): any
+    local n = select("#", ...)
+    if n < 2 then error("[shARKlib] combine() requires at least one source and a combiner", 2) end
+    local fn = select(n, ...)
+    if type(fn) ~= "function" then
+        error("[shARKlib] combine: last argument must be the combiner function", 2)
+    end
+    local sources = { select(1, ...) }
+    sources[n] = nil
+    return derive(function()
+        local args = table.create(n - 1)
+        for i = 1, n - 1 do args[i] = sources[i]() end
+        return fn(table.unpack(args, 1, n - 1))
+    end)
+end
+
+return combine

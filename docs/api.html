@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>shARKlib · API reference</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/400.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/600.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.0.20/400.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="wrap">
+<div id="sidebar-mount"></div>
+
+<main>
+<h1 id="api">API reference</h1>
+<p class="lede">Every public function exported from <code>shARKlib</code>. If you're new, read <a href="index.html#concepts">concepts</a> first.</p>
+
+<h2 id="bootstrap">Bootstrap</h2>
+
+<h3 id="api-SetTemplate"><code>SetTemplate(map)</code> · <code>SetTemplate(name, map)</code></h3>
+<p class="api-sig">SetTemplate(map: { [class]: { [prop]: any } }) → ()</p>
+<p>Register property defaults for instances. The first form sets the unnamed default template. The second registers a named template you can later select via <code>create(class, name)</code>. Multiple calls merge. Later writes override earlier ones for the same key.</p>
+<pre><code class="language-lua">sh.SetTemplate({ Frame = { BorderSizePixel = 0 } })
+sh.SetTemplate("danger", {
+  TextButton = { BackgroundColor3 = Color3.fromRGB(220, 70, 70) },
+})</code></pre>
+<div class="callout warn">Must be called <em>before</em> <code>Init()</code>.</div>
+
+<h3 id="api-Init"><code>Init()</code></h3>
+<p class="api-sig">Init() → ()</p>
+<p>Finalize templates and unlock the rest of the API. Pre-builds clone sources for every registered (class, name) pair so subsequent <code>create()</code> calls only pay for the clone plus user-supplied props.</p>
+
+<h2 id="core">Reactive core</h2>
+
+<h3 id="api-source"><code>source(initial, equals?)</code></h3>
+<p class="api-sig">source&lt;T&gt;(initial: T, equals?: (T, T) → boolean) → (T?) → T</p>
+<p>Create a reactive cell. The returned function reads when called with no arguments and writes when called with one. Writes that compare equal (via <code>equals</code>, default <code>==</code>) are skipped. Pass an updater function to compute from the previous value.</p>
+<pre><code class="language-lua">local count = sh.source(0)
+print(count())                          -- 0
+count(5)                                -- write 5
+count(function(n) return n + 1 end)     -- updater</code></pre>
+
+<h3 id="api-derive"><code>derive(fn, equals?)</code></h3>
+<p class="api-sig">derive&lt;T&gt;(fn: () → T, equals?: (T, T) → boolean) → () → T</p>
+<p>A memoized derived value. Re-runs when any tracked dependency changes; only notifies its own observers when the result differs.</p>
+<pre><code class="language-lua">local doubled = sh.derive(function() return count() * 2 end)</code></pre>
+
+<h3 id="api-effect"><code>effect(fn)</code></h3>
+<p class="api-sig">effect(fn: () → ()) → ()</p>
+<p>Schedule <code>fn</code> to run immediately and again whenever any source it reads changes. Cleanup is bound to the enclosing scope.</p>
+<pre><code class="language-lua">sh.effect(function()
+  print("count is", count())
+end)</code></pre>
+
+<h3 id="api-watch"><code>watch(source, fn)</code></h3>
+<p class="api-sig">watch&lt;T&gt;(source: () → T, fn: (new: T, old: T?) → ()) → () → ()</p>
+<p>Like <code>effect</code>, but skips the initial synchronous invocation and provides the previous value. Returns a disposer.</p>
+<pre><code class="language-lua">local stop = sh.watch(score, function(new, old)
+  print("score went from", old, "to", new)
+end)</code></pre>
+
+<h3 id="api-root"><code>root(fn)</code></h3>
+<p class="api-sig">root&lt;R...&gt;(fn: (destroy: () → ()) → R...) → R...</p>
+<p>Create a top-level reactive scope detached from any tracking parent. <code>fn</code> receives a <code>destroy</code> callback that disposes everything created inside it.</p>
+<pre><code class="language-lua">local destroy = sh.root(function(dispose)
+  sh.effect(function() ... end)
+  return dispose
+end)</code></pre>
+
+<h3 id="api-cleanup"><code>cleanup(fn)</code></h3>
+<p class="api-sig">cleanup(fn: () → ()) → ()</p>
+<p>Register a callback that runs when the enclosing scope is re-evaluated or disposed.</p>
+
+<h3 id="api-untrack"><code>untrack(fn)</code></h3>
+<p class="api-sig">untrack&lt;T&gt;(fn: () → T) → T</p>
+<p>Run <code>fn</code> without subscribing the active scope to any source it reads.</p>
+
+<h3 id="api-batch"><code>batch(fn)</code></h3>
+<p class="api-sig">batch&lt;T&gt;(fn: () → T) → T</p>
+<p>Defer queue flushing until the outermost batch returns. Multiple writes inside <code>fn</code> coalesce into a single re-evaluation pass.</p>
+
+<h3 id="api-context"><code>context(default)</code></h3>
+<p class="api-sig">context&lt;T&gt;(default: T) → Context&lt;T&gt;</p>
+<p>Lightweight dependency injection scoped to the ownership tree.</p>
+<pre><code class="language-lua">local Theme = sh.context({ accent = Color3.new(1,0,0) })
+
+-- somewhere up the tree
+Theme:provide({ accent = Color3.new(0,1,0) }, function()
+  return App()
+end)
+
+-- somewhere down the tree
+local theme = Theme:read()</code></pre>
+
+<h3 id="api-read"><code>read(value)</code></h3>
+<p class="api-sig">read&lt;T&gt;(value: T | () → T) → T</p>
+<p>Resolve a value that may be either a plain value or a 0-arg getter. Useful for accepting either as a prop.</p>
+
+<h3 id="api-errorBoundary"><code>errorBoundary(try, fallback)</code></h3>
+<p class="api-sig">errorBoundary(try: () → any, fallback: (err, reset: () → ()) → any) → () → any</p>
+<p>Catch errors thrown anywhere in the descendant graph and render <code>fallback</code> instead. Calling <code>reset()</code> re-runs <code>try</code>.</p>
+<pre><code class="language-lua">sh.errorBoundary(App, function(err, reset)
+  return sh.create("TextButton") {
+    Text = "error: " .. tostring(err) .. " (click to retry)",
+    Activated = reset,
+  }
+end)</code></pre>
+
+<h3 id="api-lazy"><code>lazy(loader)</code></h3>
+<p class="api-sig">lazy&lt;T&gt;(loader: () → () → T) → () → T</p>
+<p>Defer construction of a component until first render. <code>loader</code> is called once; subsequent reads use the cached component.</p>
+
+<h3 id="api-signal"><code>signal()</code></h3>
+<p class="api-sig">signal&lt;T...&gt;() → Signal&lt;T...&gt;</p>
+<p>An allocation-friendly pub/sub primitive. Returns an object with <code>connect</code>, <code>once</code>, <code>fire</code>, <code>wait</code>, and <code>destroy</code>. Connections auto-disconnect on scope cleanup.</p>
+<pre><code class="language-lua">local toast = sh.signal()
+toast:connect(function(msg) print(msg) end)
+toast:fire("Saved")</code></pre>
+
+<h2 id="instance">Instance authoring</h2>
+
+<h3 id="api-create"><code>create(class)</code> · <code>create(class, templateName)</code> · <code>create(instance)</code></h3>
+<p class="api-sig">create(target: string | Instance, templateName?: string) → (props) → Instance</p>
+<p>Returns a function that, given a props table, creates an instance. The first arg is a class name (<code>"Frame"</code>) or an existing Instance to clone. The optional second arg picks a named template registered with <code>SetTemplate</code>.</p>
+<pre><code class="language-lua">sh.create("Frame") { Size = UDim2.fromScale(1, 1) }
+sh.create("TextButton", "primary") { Text = "Go" }
+sh.create(myTemplate) { Name = "Clone" }</code></pre>
+<p>Props are interpreted as:</p>
+<ul>
+  <li><strong>String keys</strong> set properties. If the value is a function, it becomes a reactive binding that re-evaluates when its sources change.</li>
+  <li><strong><code>RBXScriptSignal</code> keys</strong> connect callbacks. <code>Activated = fn</code> works because <code>TextButton.Activated</code> is a signal property.</li>
+  <li><strong>Numeric keys</strong> are children: instances, arrays of instances, action objects, or 0-arg functions returning instances (dynamic).</li>
+  <li><strong>The <code>Children</code> sentinel</strong> can be used as a key for an explicit children array.</li>
+</ul>
+
+<h3 id="api-apply"><code>apply(instance, props)</code></h3>
+<p class="api-sig">apply(instance: Instance, props: { [any]: any }) → Instance</p>
+<p>Apply a props table to an existing instance. Same semantics as the props pass of <code>create</code>.</p>
+
+<h3 id="api-mount"><code>mount(component, parent?)</code></h3>
+<p class="api-sig">mount(component: () → Instance | { Instance }, parent?: Instance) → () → ()</p>
+<p>Render <code>component</code> inside a fresh root and parent the result. Returns a destroy callback that disposes the entire subtree.</p>
+
+<h3 id="api-Children"><code>Children</code></h3>
+<p>An exported sentinel value. Use as a key when you want to pass children explicitly:</p>
+<pre><code class="language-lua">sh.create("Frame") {
+  Size = UDim2.fromScale(1, 1),
+  [sh.Children] = { btn1, btn2 },
+}</code></pre>
+
+<h3 id="api-action"><code>action(fn, priority?)</code></h3>
+<p class="api-sig">action(fn: (Instance) → (), priority?: number) → Action</p>
+<p>Wrap a callback to run against an instance after props and children are applied. Lower priority runs first; built-in helpers like <code>ref</code> use very negative priorities.</p>
+
+<h3 id="api-changed"><code>changed(property, callback)</code></h3>
+<p class="api-sig">changed(property: string, callback: (any) → ()) → Action</p>
+<p>Mirror an instance property into a callback (or source) on every change.</p>
+<pre><code class="language-lua">local text = sh.source("")
+sh.create("TextBox") { sh.changed("Text", text) }</code></pre>
+
+<h3 id="api-portal"><code>portal(target, children)</code></h3>
+<p class="api-sig">portal(target: Instance, children: { any }) → Instance</p>
+<p>Render children into an arbitrary target instance instead of the enclosing parent. Useful for tooltips and modals.</p>
+
+<h3 id="api-tag"><code>tag(name)</code></h3>
+<p class="api-sig">tag(name: string) → Action</p>
+<p>Add a CollectionService tag, removed automatically on cleanup.</p>
+
+<h3 id="api-smoothLayout"><code>smoothLayout(opts?, springOpts?)</code></h3>
+<p class="api-sig">smoothLayout(opts?, springOpts?: { period?, damping? }) → Action</p>
+<p>A drop-in replacement for <code>UIListLayout</code> that springs each child to its target slot. Supports <code>FillDirection</code>, <code>Padding</code>, <code>SortOrder</code>, <code>HorizontalAlignment</code>, and <code>VerticalAlignment</code>. A single shared Heartbeat drives every active layout.</p>
+<pre><code class="language-lua">sh.create("Frame") {
+  sh.smoothLayout({ Padding = UDim.new(0, 6) }, { period = 0.35, damping = 0.7 }),
+  -- ...children
+}</code></pre>
+
+<h3 id="api-onMount"><code>onMount(fn)</code></h3>
+<p class="api-sig">onMount(fn: (Instance) → ()) → Action</p>
+<p>Run <code>fn</code> on the next frame after the instance is parented into the live tree (so <code>AbsoluteSize</code>/<code>AbsolutePosition</code> are real).</p>
+
+<h3 id="api-onEvent"><code>onEvent(name, fn)</code></h3>
+<p class="api-sig">onEvent(name: string, fn: (...any) → ()) → Action</p>
+<p>Connect to any <code>RBXScriptSignal</code> property by string name with auto-cleanup.</p>
+
+<h3 id="api-ref"><code>ref(target)</code></h3>
+<p class="api-sig">ref(target: ((Instance) → ()) | source) → Action</p>
+<p>Capture an Instance reference into a callback or a source. Runs very early so other actions in the same props table can read the captured ref.</p>
+
+<h3 id="api-keybind"><code>keybind(key, fn, opts?)</code></h3>
+<p class="api-sig">keybind(key: Enum.KeyCode, fn: (InputObject) → (), opts?: { gameProcessed?, ended? })</p>
+<p>Attach a keyboard binding for the lifetime of the enclosing scope.</p>
+<pre><code class="language-lua">sh.keybind(Enum.KeyCode.Escape, close)
+sh.keybind(Enum.KeyCode.E, interact, { gameProcessed = true })</code></pre>
+
+<h3 id="api-hover"><code>hover()</code></h3>
+<p class="api-sig">hover() → (Action, () → boolean)</p>
+<p>Returns an <code>(action, source)</code> pair. The action wires <code>MouseEnter</code>/<code>MouseLeave</code> to the boolean source.</p>
+<pre><code class="language-lua">local hAct, isHover = sh.hover()
+sh.create("Frame") {
+  BackgroundTransparency = function() return isHover() and 0 or 0.2 end,
+  hAct,
+}</code></pre>
+
+<h3 id="api-pressed"><code>pressed()</code></h3>
+<p class="api-sig">pressed() → (Action, () → boolean)</p>
+<p>Like <code>hover</code> but tracks whether the user is currently holding the mouse / touch.</p>
+
+<h3 id="api-drag"><code>drag(initial?)</code></h3>
+<p class="api-sig">drag(initial?: UDim2) → (Action, () → UDim2)</p>
+<p>Make a GuiObject draggable. Bind the returned source back to <code>Position</code> so the move sticks.</p>
+<pre><code class="language-lua">local d, pos = sh.drag()
+sh.create("Frame") { Position = pos, d }</code></pre>
+
+<h3 id="api-screenSize"><code>screenSize()</code></h3>
+<p class="api-sig">screenSize() → () → Vector2</p>
+<p>A reactive source mirroring <code>workspace.CurrentCamera.ViewportSize</code>. Follows camera changes automatically.</p>
+
+<h3 id="api-fade"><code>fade(opts?)</code></h3>
+<p class="api-sig">fade(opts?: { duration?, easing?, direction?, fadeOut?, propertyMap? }) → Action</p>
+<p>Tween transparency-style properties from <code>1</code> → original on mount and (optionally) back on cleanup. Auto-detects <code>BackgroundTransparency</code>, <code>TextTransparency</code>, and <code>ImageTransparency</code> by default.</p>
+
+<h2 id="flow">Control flow</h2>
+
+<h3 id="api-show"><code>show(cond, component, fallback?)</code></h3>
+<p class="api-sig">show&lt;T&gt;(cond: () → any, component: () → T, fallback?: () → T) → () → T?</p>
+<p>Conditionally renders a component based on the truthiness of <code>cond</code>. The component re-runs only when truthiness changes, so unrelated state updates don't recreate it.</p>
+
+<h3 id="api-switch"><code>switch(source)(cases)</code></h3>
+<p class="api-sig">switch&lt;K&gt;(source: () → K) → (cases: { [K]: () → any }) → () → any</p>
+<p>Selects one component per source value. Components are memoized per key, so switching back is cheap.</p>
+<pre><code class="language-lua">sh.switch(route) {
+  home    = HomePage,
+  profile = ProfilePage,
+  about   = AboutPage,
+}</code></pre>
+
+<h3 id="api-match"><code>match(source)(cases)</code></h3>
+<p class="api-sig">match&lt;T&gt;(source: () → T) → (cases: {{ predicate, component }}) → () → any</p>
+<p>Like <code>switch</code> but matches via predicates instead of equality.</p>
+<pre><code class="language-lua">sh.match(state) {
+  { function(s) return s.kind == "loading" end, Loading },
+  { function(s) return s.kind == "ready"   end, Ready   },
+}</code></pre>
+
+<h3 id="api-indexes"><code>indexes(list, component)</code></h3>
+<p class="api-sig">indexes&lt;T&gt;(list: () → { T }, component: (() → T, number) → any) → () → { any }</p>
+<p>Render a list keyed by <em>index</em>. Each component receives a source yielding the current value at that position. Best when items are not reordered.</p>
+
+<h3 id="api-values"><code>values(list, component)</code></h3>
+<p class="api-sig">values&lt;T&gt;(list: () → { T }, component: (T, () → number) → any) → () → { any }</p>
+<p>Render a list keyed by <em>value identity</em>: rendered instances are preserved when items are reordered. Each component receives the value and a source yielding its index.</p>
+
+<h2 id="animation">Animation</h2>
+
+<h3 id="api-spring"><code>spring(target, period?, damping?)</code></h3>
+<p class="api-sig">spring&lt;T&gt;(target: () → T, period?: number, damping?: number) → () → T</p>
+<p>Animated source driven by a critically-/under-damped harmonic oscillator. Tracks any source returning <code>number</code>, <code>Vector2</code>, <code>Vector3</code>, <code>Color3</code>, <code>UDim</code>, or <code>UDim2</code>. A single shared Heartbeat drives every active spring.</p>
+<pre><code class="language-lua">local pos = sh.source(UDim2.fromScale(0, 0))
+local smooth = sh.spring(pos, 0.4, 0.7)
+
+sh.create("Frame") { Position = smooth }
+pos(UDim2.fromScale(1, 0)) -- glides smoothly across the screen</code></pre>
+
+<h3 id="api-tween"><code>tween(target, info?)</code></h3>
+<p class="api-sig">tween&lt;T&gt;(target: () → T, info?: TweenInfo) → () → T</p>
+<p>Animate a source toward a target using Roblox's <code>TweenService</code> easing curves. Returns a source that tracks the interpolated value.</p>
+
+<h2 id="data">Data</h2>
+
+<h3 id="api-resource"><code>resource(fetcher)</code></h3>
+<p class="api-sig">resource&lt;T&gt;(fetcher: () → T) → (() → T?, ResourceStatus)</p>
+<p>Asynchronous source. <code>fetcher</code> runs in a task; while pending the source returns <code>nil</code> and <code>status.loading()</code> is true. On error <code>status.error()</code> returns the thrown value. Re-runs whenever a tracked dependency changes; <code>status.refetch()</code> reruns manually.</p>
+<pre><code class="language-lua">local user, status = sh.resource(function()
+  return getUser(userId())
+end)
+
+sh.show(status.loading, Spinner, function()
+  return sh.create("TextLabel") {
+    Text = function() return user() and user().name or "" end,
+  }
+end)</code></pre>
+
+<h3 id="api-store"><code>store(initial)</code></h3>
+<p class="api-sig">store&lt;T&gt;(initial: T) → Store&lt;T&gt;</p>
+<p>A deeply-reactive table. Reading any nested field while in a tracking scope subscribes to that exact path. Writes via <code>store:set(path, value)</code> only notify subscribers of changed paths.</p>
+<pre><code class="language-lua">local s = sh.store({ user = { name = "Ada", age = 30 } })
+
+sh.effect(function() print(s.user.name) end)
+s:set({ "user", "name" }, "Grace") -- only the print re-runs</code></pre>
+
+<h3 id="api-selector"><code>selector(source)</code></h3>
+<p class="api-sig">selector&lt;K&gt;(input: () → K) → (key: K) → () → boolean</p>
+<p>Efficient single-key selector for highlight-style UIs. Given a source returning the "selected key", returns a function that yields a boolean source for any candidate key. Only the previously and currently selected keys' sources invalidate per change, giving O(1) updates instead of O(N) over the list.</p>
+<pre><code class="language-lua">local selected = sh.source("home")
+local isSelected = sh.selector(selected)
+
+-- inside a list component
+TextColor3 = function() return isSelected("home")() and accent or fg end</code></pre>
+
+<h3 id="api-debounce"><code>debounce(source, delay)</code></h3>
+<p class="api-sig">debounce&lt;T&gt;(input: () → T, delay: number) → () → T</p>
+<p>Wraps a source so downstream observers are only notified after <code>delay</code> seconds of quiet.</p>
+<pre><code class="language-lua">local query = sh.source("")
+local debounced = sh.debounce(query, 0.25)
+sh.effect(function() runSearch(debounced()) end)</code></pre>
+
+<h3 id="api-throttle"><code>throttle(source, interval)</code></h3>
+<p class="api-sig">throttle&lt;T&gt;(input: () → T, interval: number) → () → T</p>
+<p>Like <code>debounce</code>, but emits the leading edge immediately and coalesces further changes within the window.</p>
+
+<h3 id="api-combine"><code>combine(...sources, fn)</code></h3>
+<p class="api-sig">combine(...sources, fn: (...) → R) → () → R</p>
+<p>Combine N sources into one derived value. The last argument is the combiner.</p>
+<pre><code class="language-lua">local pos = sh.combine(x, y, function(xv, yv)
+  return Vector2.new(xv, yv)
+end)</code></pre>
+
+<h3 id="api-mapList"><code>mapList(list, fn)</code></h3>
+<p class="api-sig">mapList&lt;T, R&gt;(list: () → { T }, fn: (T, number) → R) → () → { R }</p>
+<p>Reactively map over an array source, caching transformed values per item identity (so unchanged items don't recompute).</p>
+
+<h2 id="tooling">Tooling</h2>
+
+<h3 id="api-scheduler"><code>scheduler</code></h3>
+<p>Runtime hooks. Each method is init-gated.</p>
+<ul>
+  <li><code>scheduler.setStrict(boolean)</code>: re-run effects an extra time to surface side-effect bugs.</li>
+  <li><code>scheduler.setOnError(fn)</code>: global handler for uncaught reactive errors.</li>
+  <li><code>scheduler.flushSync()</code>: drain pending updates immediately.</li>
+  <li><code>scheduler.setDevtools({ onCreate, onDispose, onRun })</code>: register devtools observer for graph nodes.</li>
+</ul>
+
+<hr/>
+<p style="color: var(--fg-faint); font-size: 0.85rem;">shARKlib · MIT-style license · built with Rojo · <a href="index.html">Back to overview</a></p>
+
+</main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/lua.min.js"></script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

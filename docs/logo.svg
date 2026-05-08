@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 96" fill="none">
+  <defs>
+    <linearGradient id="finGrad" x1="0" y1="0" x2="0.55" y2="1">
+      <stop offset="0" stop-color="#ff7ab6"/>
+      <stop offset="1" stop-color="#7aa2ff"/>
+    </linearGradient>
+    <linearGradient id="finGrad2" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#ff9ec9" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#9bb6ff" stop-opacity="0.85"/>
+    </linearGradient>
+    <linearGradient id="waveGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"   stop-color="#7aa2ff" stop-opacity="0"/>
+      <stop offset="0.18" stop-color="#7aa2ff" stop-opacity="0.95"/>
+      <stop offset="0.82" stop-color="#7aa2ff" stop-opacity="0.95"/>
+      <stop offset="1"   stop-color="#7aa2ff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="bodyGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"   stop-color="#3a4970" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#3a4970" stop-opacity="0.55"/>
+      <stop offset="1"   stop-color="#3a4970" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="bubbleGrad" cx="0.4" cy="0.35" r="0.7">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#7aa2ff" stop-opacity="0.4"/>
+    </radialGradient>
+  </defs>
+
+  <!-- accent dots above the water (suggestive of "data" / sources) -->
+  <circle cx="14"  cy="16" r="1.8" fill="#ff7ab6" opacity="0.75"/>
+  <circle cx="24"  cy="9"  r="1.2" fill="#7aa2ff" opacity="0.6"/>
+  <circle cx="130" cy="14" r="1.6" fill="#7aa2ff" opacity="0.55"/>
+  <circle cx="120" cy="24" r="1.1" fill="#ff7ab6" opacity="0.5"/>
+
+  <!-- shark body silhouette beneath the water -->
+  <path d="M16 74
+           C 36 64, 70 64, 100 68
+           C 116 70, 128 74, 134 80
+           C 118 82, 100 82, 80 80
+           C 60 78, 38 80, 16 74 Z"
+        fill="url(#bodyGrad)"/>
+
+  <!-- tail fin (upper lobe only, peeking out) -->
+  <path d="M104 70
+           C 108 56, 116 46, 124 38
+           C 122 50, 122 60, 122 70 Z"
+        fill="url(#finGrad2)"/>
+
+  <!-- main dorsal fin -->
+  <path d="M30 74
+           C 40 42, 56 22, 70 18
+           C 78 28, 86 52, 90 74
+           C 70 70, 50 70, 30 74 Z"
+        fill="url(#finGrad)"/>
+
+  <!-- highlight stripe on fin -->
+  <path d="M50 68 C 56 50 64 32 70 24"
+        stroke="#ffffff" stroke-opacity="0.42" stroke-width="3"
+        stroke-linecap="round" fill="none"/>
+
+  <!-- secondary inner fin shadow (depth) -->
+  <path d="M88 74 C 84 60 80 48 78 38"
+        stroke="#3a4970" stroke-opacity="0.25" stroke-width="2.5"
+        stroke-linecap="round" fill="none"/>
+
+  <!-- foreground wave -->
+  <path d="M2 78 Q 22 72 44 76 T 88 76 T 142 78"
+        stroke="url(#waveGrad)" stroke-width="3.2"
+        stroke-linecap="round" fill="none"/>
+
+  <!-- background wave -->
+  <path d="M6 86 Q 30 80 56 84 T 102 84 T 138 86"
+        stroke="url(#waveGrad)" stroke-width="2.2"
+        stroke-linecap="round" fill="none" opacity="0.55"/>
+
+  <!-- splash bubbles where the fin breaks the surface -->
+  <circle cx="26" cy="70" r="2"   fill="url(#bubbleGrad)"/>
+  <circle cx="20" cy="64" r="1.2" fill="#ffffff" opacity="0.6"/>
+  <circle cx="92" cy="68" r="1.6" fill="url(#bubbleGrad)"/>
+  <circle cx="98" cy="62" r="1"   fill="#ffffff" opacity="0.55"/>
+</svg>
