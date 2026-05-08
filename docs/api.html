@@ -11,13 +11,15 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css" />
 <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-<div class="wrap">
+<body data-page="api">
+<div id="topnav-mount"></div>
+
+<div class="shell">
 <div id="sidebar-mount"></div>
 
-<main>
+<main class="docs">
 <h1 id="api">API reference</h1>
-<p class="lede">Every public function exported from <code>shARKlib</code>. If you're new, read <a href="index.html#concepts">concepts</a> first.</p>
+<p class="lede">Every public function exported from <code>shARKlib</code>. If you are new, read the <a href="guide.html">guide</a> first.</p>
 
 <h2 id="bootstrap">Bootstrap</h2>
 
@@ -334,11 +336,10 @@ end)</code></pre>
   <li><code>scheduler.setDevtools({ onCreate, onDispose, onRun })</code>: register devtools observer for graph nodes.</li>
 </ul>
 
-<hr/>
-<p style="color: var(--fg-faint); font-size: 0.85rem;">shARKlib · MIT-style license · built with Rojo · <a href="index.html">Back to overview</a></p>
-
 </main>
 </div>
+
+<div id="footer-mount"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/core.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/lua.min.js"></script>

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Guide · shARKlib</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/400.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/600.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.0.20/400.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="guide">
+<div id="topnav-mount"></div>
+
+<div class="shell no-sidebar">
+<main class="docs">
+  <h1>Guide</h1>
+  <p class="lede">Everything you need to start writing reactive UI in Roblox with shARKlib. If you have used Vide or Solid, you will feel at home. If you have not, the whole library is built on three primitives and a couple of conventions.</p>
+
+  <h2 id="install">Installation</h2>
+  <p>The simplest option is the prebuilt model:</p>
+  <ol>
+    <li>Grab <code>shARKlib.rbxm</code> from <a href="https://github.com/Marioispro1/shARKlib/releases">releases</a>.</li>
+    <li>In Studio, right click <code>ReplicatedStorage</code> and pick <em>Insert from File…</em>.</li>
+    <li>Require it: <code>local sh = require(ReplicatedStorage.shARKlib)</code>.</li>
+  </ol>
+  <p>Prefer to vendor the source? Copy <code>src/shared/shARKlib/</code> into your project. The folder is self-contained, no external runtime.</p>
+  <p>Building the rbxm yourself with Rojo:</p>
+<pre><code class="language-bash">rojo build shARKlib.project.json -o shARKlib.rbxm</code></pre>
+
+  <h2 id="quickstart">Quick start</h2>
+  <p>A counter with a button. Three concepts on display: <code>source</code>, <code>create</code>, <code>mount</code>.</p>
+<pre><code class="language-lua">local sh = require(ReplicatedStorage.shARKlib)
+
+sh.SetTemplate({
+  Frame     = { BackgroundColor3 = Color3.fromRGB(28, 28, 32) },
+  TextLabel = { TextColor3       = Color3.fromRGB(235, 235, 240) },
+})
+sh.SetTemplate("primary", {
+  TextButton = { BackgroundColor3 = Color3.fromRGB(34, 211, 238) },
+})
+sh.Init()
+
+sh.mount(function()
+  local count = sh.source(0)
+  return sh.create("TextButton", "primary") {
+    Size = UDim2.fromOffset(200, 40),
+    Text = function() return "clicks: " .. count() end,
+    Activated = function() count(count() + 1) end,
+  }
+end, Players.LocalPlayer.PlayerGui)</code></pre>
+
+  <h2 id="reactive-graph">The reactive graph</h2>
+  <p>There are three primitives. Everything else is built on them.</p>
+  <h3><code>source(initial)</code></h3>
+  <p>A mutable cell. Call with no args to read, with one arg to write. Reading inside a tracked scope creates a subscription. Writing notifies subscribers.</p>
+<pre><code class="language-lua">local n = sh.source(0)
+print(n())   -- 0
+n(5)
+print(n())   -- 5</code></pre>
+
+  <h3><code>derive(fn)</code></h3>
+  <p>A cached value computed from other sources. Re-runs when one of its dependencies changes. Returns a getter.</p>
+<pre><code class="language-lua">local first = sh.source("Ada")
+local last  = sh.source("Lovelace")
+local full  = sh.derive(function() return first() .. " " .. last() end)
+print(full()) -- "Ada Lovelace"</code></pre>
+
+  <h3><code>effect(fn)</code></h3>
+  <p>A side effect. Runs once now, and again whenever a source it reads changes. Use it for things that touch the outside world: prints, network calls, manual instance fiddling.</p>
+<pre><code class="language-lua">sh.effect(function()
+  print("count is now", count())
+end)</code></pre>
+
+  <h2 id="components">Components</h2>
+  <p>A component is just a function that returns an Instance. Local state lives in a closure.</p>
+<pre><code class="language-lua">local function Toggle()
+  local on = sh.source(false)
+  return sh.create("TextButton") {
+    Text = function() return on() and "ON" or "OFF" end,
+    Activated = function() on(not on()) end,
+  }
+end</code></pre>
+  <p>String props set properties. Numeric children become parented Instances. <code>RBXScriptSignal</code> keys connect callbacks. Function values become reactive bindings: they re-run when their dependencies change and their result is written back to the property.</p>
+
+  <h2 id="templates">Templates and Init</h2>
+  <p><code>SetTemplate</code> registers default properties per class. The unnamed form sets the global default. Named forms register variants you can pick later.</p>
+<pre><code class="language-lua">sh.SetTemplate({
+  Frame = { BorderSizePixel = 0, BackgroundColor3 = bg },
+})
+sh.SetTemplate("primary", { TextButton = { BackgroundColor3 = blue } })
+sh.SetTemplate("danger",  { TextButton = { BackgroundColor3 = red  } })
+
+sh.Init()
+
+sh.create("TextButton", "primary") { Text = "Save" }
+sh.create("TextButton", "danger")  { Text = "Delete" }</code></pre>
+  <p>Multiple <code>SetTemplate</code> calls merge. Later writes override earlier ones for the same key. Once you call <code>sh.Init()</code> the templates freeze and the rest of the API unlocks. Calling other API functions before Init is an error. Calling SetTemplate after Init is also an error.</p>
+
+  <h2 id="cleanup">Cleanup</h2>
+  <p>Every effect, derive, and component runs inside an <em>owner scope</em>. When the owner is disposed (because something higher up re-evaluated, or because you called the destroy callback returned by <code>root</code> or <code>mount</code>), all of its children are disposed, all of its <code>cleanup</code> callbacks run, and any events it connected get disconnected. You will rarely write cleanup code yourself.</p>
+
+  <h2 id="next">Next</h2>
+  <p>Browse the full <a href="api.html">API reference</a> for every export with signatures and examples.</p>
+</main>
+</div>
+
+<div id="footer-mount"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/lua.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/bash.min.js"></script>
+<script>hljs.registerLanguage("lua", window.hljsDefineLua || hljs.getLanguage("lua"));</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>
