@@ -81,10 +81,25 @@ const sidebarHTML = `
 
 document.getElementById("sidebar-mount").outerHTML = sidebarHTML;
 
-// highlight current page link, and current section on scroll
-const here = location.pathname.split("/").pop() + location.hash;
-document.querySelectorAll("aside.sidebar a").forEach((a) => {
-  if (a.getAttribute("href") === here) a.classList.add("active");
-});
+const links = document.querySelectorAll("aside.sidebar a");
+
+function currentKey() {
+  let file = location.pathname.split("/").pop();
+  if (!file) file = "index.html";
+  return file + location.hash;
+}
+
+function updateActive() {
+  const here = currentKey();
+  const fileOnly = here.split("#")[0];
+  links.forEach((a) => {
+    const href = a.getAttribute("href") || "";
+    a.classList.toggle("active", href === here || (href === fileOnly && !location.hash));
+  });
+}
+
+updateActive();
+window.addEventListener("hashchange", updateActive);
+window.addEventListener("popstate", updateActive);
 
 if (window.hljs) hljs.highlightAll();
