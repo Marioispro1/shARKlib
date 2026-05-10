@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  validate-rojo-builds:
+    name: Validate Rojo Builds
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rokit
+        shell: bash
+        run: |
+          curl -sSf https://raw.githubusercontent.com/rojo-rbx/rokit/main/scripts/install.sh | bash
+          echo "$HOME/.rokit/bin" >> "$GITHUB_PATH"
+          "$HOME/.rokit/bin/rokit" --version
+
+      - name: Install Toolchain
+        run: rokit install
+
+      - name: Show Rojo Version
+        run: rojo --version
+
+      - name: Build Library Model
+        run: rojo build shARKlib.project.json -o shARKlib.rbxm
+
+      - name: Build Demo Place
+        run: rojo build default.project.json -o test.rbxlx

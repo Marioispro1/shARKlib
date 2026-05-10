@@ -133,6 +133,12 @@ end
 ----------------------------------------------------------------------
 
 local destroy = sh.mount(function()
+	-- scheduler hooks (install early so setup-time errors use demo handler)
+	sh.scheduler.setStrict(false)
+	sh.scheduler.setOnError(function(err)
+		warn("[shARKlib demo] caught:", err)
+	end)
+
 	-- 1. source / derive / effect / watch / untrack / batch / cleanup
 	local count = sh.source(0)
 	local doubled = sh.derive(function()
@@ -243,12 +249,6 @@ local destroy = sh.mount(function()
 
 	sh.keybind(Enum.KeyCode.Space, function()
 		count(count() + 1)
-	end)
-
-	-- scheduler hooks
-	sh.scheduler.setStrict(false)
-	sh.scheduler.setOnError(function(err)
-		warn("[shARKlib demo] caught:", err)
 	end)
 
 	----------------------------------------------------------------
@@ -383,7 +383,7 @@ local destroy = sh.mount(function()
 					LayoutOrder = 13,
 					sh.create("UIListLayout")({ Padding = UDim.new(0, 4) }),
 					Status(function()
-						return "mode=" .. mode() .. "   visible=" .. tostring(visible())
+						return "mode=" .. tostring(mode()) .. "   visible=" .. tostring(visible())
 					end),
 					Row(
 						sh.create("TextButton")({
@@ -810,7 +810,6 @@ local destroy = sh.mount(function()
 							Size = UDim2.fromOffset(80, 80),
 							Position = dragPos,
 							BackgroundColor3 = Color3.fromRGB(248, 113, 113),
-							Text = "drag me",
 							sh.create("UICorner")({ CornerRadius = UDim.new(0, 6) }),
 							dAct,
 							sh.create("TextLabel")({

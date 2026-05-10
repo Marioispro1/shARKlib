@@ -58,6 +58,14 @@ To build the rbxm yourself:
 rojo build shARKlib.project.json -o shARKlib.rbxm
 ```
 
+## Continuous Integration
+
+GitHub Actions runs [`ci.yml`](.github/workflows/ci.yml) on pushes and pull requests.
+It installs tools from `rokit.toml` and validates both Rojo projects by building:
+
+- `shARKlib.project.json` (library model output)
+- `default.project.json` (demo place output)
+
 ## How it works in 30 seconds
 
 There are three reactive primitives.

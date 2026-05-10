@@ -1,12 +1,15 @@
 --!strict
 local derive = require(script.Parent.Parent.core.derive)
+local Log = require(script.Parent.Parent.tooling.log)
 
 local function combine(...): any
     local n = select("#", ...)
-    if n < 2 then error("[shARKlib] combine() requires at least one source and a combiner", 2) end
+    if n < 2 then
+        error(Log.message("data.combine", "validate", "requires at least one source and a combiner"), 2)
+    end
     local fn = select(n, ...)
     if type(fn) ~= "function" then
-        error("[shARKlib] combine: last argument must be the combiner function", 2)
+        error(Log.message("data.combine", "validate", "last argument must be the combiner function"), 2)
     end
     local sources = { select(1, ...) }
     sources[n] = nil

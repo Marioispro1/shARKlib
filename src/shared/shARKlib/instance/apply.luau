@@ -1,6 +1,7 @@
 --!strict
 local Runtime = require(script.Parent.Parent.core.runtime)
 local Graph = require(script.Parent.Parent.core.graph)
+local Log = require(script.Parent.Parent.tooling.log)
 
 local Children = newproxy(false) -- exported sentinel
 local CHILDREN_KEY = Children
@@ -29,7 +30,7 @@ end
 
 local function bindEvent(_instance: Instance, signal: RBXScriptSignal, handler: any)
 	if type(handler) ~= "function" then
-		error("[shARKlib] event handler must be a function", 3)
+		error(Log.message("instance.apply", "bindEvent", "event handler must be a function"), 3)
 	end
 	local conn = signal:Connect(handler)
 	if Runtime.owner then
@@ -119,7 +120,7 @@ function addChild(parent: Instance, child: any)
 	elseif typeof(child) == "Instance" then
 		child.Parent = parent
 	else
-		error("[shARKlib] invalid child of type " .. typeof(child), 3)
+		error(Log.message("instance.apply", "addChild", "invalid child of type " .. typeof(child)), 3)
 	end
 end
 

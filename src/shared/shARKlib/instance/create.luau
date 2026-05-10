@@ -1,6 +1,7 @@
 --!strict
 local apply     = require(script.Parent.apply)
 local Templates = require(script.Parent.templates)
+local Log = require(script.Parent.Parent.tooling.log)
 
 type Props = { [any]: any }
 
@@ -18,7 +19,7 @@ local function create(target: string | Instance, templateName: string?): (Props)
             return apply.apply(source:Clone(), props)
         end
     end
-    error("[shARKlib] create() expects a class name or Instance", 2)
+    error(Log.message("instance.create", "create", "expects a class name or Instance"), 2)
 end
 
 return create

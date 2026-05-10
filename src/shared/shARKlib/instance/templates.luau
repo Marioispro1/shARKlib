@@ -1,5 +1,6 @@
 --!strict
 local builtin = require(script.Parent.defaults)
+local Log = require(script.Parent.Parent.tooling.log)
 
 local Templates = {}
 
@@ -28,7 +29,7 @@ end
 -- on top of any previous templates of the same name.
 function Templates.set(arg1: any, arg2: any?)
     if Templates.initialized then
-        error("[shARKlib] SetTemplate cannot be called after Init()", 3)
+        error(Log.message("templates", "set", "SetTemplate cannot be called after Init()"), 3)
     end
 
     local name: string?, map: { [string]: { [string]: any } }
@@ -36,13 +37,13 @@ function Templates.set(arg1: any, arg2: any?)
         name = arg1
         map = arg2 :: any
         if type(map) ~= "table" then
-            error("[shARKlib] SetTemplate(name, map) expects a table as second arg", 3)
+            error(Log.message("templates", "set", "SetTemplate(name, map) expects a table as second arg"), 3)
         end
     else
         name = nil
         map = arg1 :: any
         if type(map) ~= "table" then
-            error("[shARKlib] SetTemplate(map) expects a table", 3)
+            error(Log.message("templates", "set", "SetTemplate(map) expects a table"), 3)
         end
     end
 
@@ -83,7 +84,7 @@ function Templates.resolve(class: string, name: string?): Instance
 
     local ok, instance = pcall(Instance.new, class)
     if not ok then
-        error("[shARKlib] cannot create instance of class " .. class, 3)
+        error(Log.message("templates", "resolve", "cannot create instance of class " .. class), 3)
     end
 
     local b = builtin[class]
@@ -96,7 +97,7 @@ function Templates.resolve(class: string, name: string?): Instance
         local byClass = Templates.named[class]
         local n = byClass and byClass[name]
         if not n then
-            error(("[shARKlib] no template '%s' for class '%s'"):format(name, class), 3)
+            error(Log.message("templates", "resolve", ("no template '%s' for class '%s'"):format(name, class)), 3)
         end
         for k, v in pairs(n) do (instance :: any)[k] = v end
     end
@@ -108,7 +109,7 @@ end
 -- pre-warm the cache for every (class, name?) registered.
 function Templates.init()
     if Templates.initialized then
-        warn("[shARKlib] Init() called twice; ignoring")
+        Log.warn("templates", "init", "Init() called twice; ignoring")
         return
     end
     Templates.initialized = true
