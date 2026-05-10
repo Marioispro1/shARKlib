@@ -1,5 +1,6 @@
 --!strict
 local Runtime = require(script.Parent.runtime)
+local Log = require(script.Parent.Parent.tooling.log)
 
 type Node = Runtime.Node
 
@@ -277,7 +278,7 @@ function flushQueue()
 			-- safety net for circular reactive dependencies
 			table.clear(Runtime.queue)
 			table.clear(queued)
-			error("[shARKlib] flushQueue: aborted after 1000 passes (cycle?)", 0)
+			error(Log.message("graph", "flushQueue", "aborted after 1000 passes (cycle?)"), 0)
 		end
 	end
 end

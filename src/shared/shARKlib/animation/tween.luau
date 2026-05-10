@@ -5,6 +5,8 @@ local TweenService = game:GetService("TweenService")
 local Graph = require(script.Parent.Parent.core.graph)
 local Runtime = require(script.Parent.Parent.core.runtime)
 local source = require(script.Parent.Parent.core.source)
+local untrack = require(script.Parent.Parent.core.untrack)
+local Log = require(script.Parent.Parent.tooling.log)
 
 local function lerpAny(a: any, b: any, t: number): any
 	local kind = typeof(a)
@@ -25,7 +27,7 @@ local function lerpAny(a: any, b: any, t: number): any
 			a.Y.Offset + (b.Y.Offset - a.Y.Offset) * t
 		)
 	end
-	error("[shARKlib] tween: unsupported type " .. kind, 3)
+	error(Log.message("animation.tween", "lerpAny", "unsupported type " .. kind), 3)
 end
 
 local function tween<T>(target: () -> T, info: TweenInfo?): () -> T

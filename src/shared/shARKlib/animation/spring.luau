@@ -5,6 +5,7 @@ local Graph = require(script.Parent.Parent.core.graph)
 local Runtime = require(script.Parent.Parent.core.runtime)
 local source = require(script.Parent.Parent.core.source)
 local untrack = require(script.Parent.Parent.core.untrack)
+local Log = require(script.Parent.Parent.tooling.log)
 
 ----------------------------------------------------------------------
 -- value <-> component vector helpers
@@ -30,7 +31,7 @@ local function decompose(v: any): ({ number }, string)
 	if t == "UDim2" then
 		return { v.X.Scale, v.X.Offset, v.Y.Scale, v.Y.Offset }, "UDim2"
 	end
-	error("[shARKlib] spring: unsupported value type " .. t, 3)
+	error(Log.message("animation.spring", "decompose", "unsupported value type " .. t), 3)
 end
 
 local function recompose(parts: { number }, kind: string): any

@@ -1,5 +1,6 @@
 --!strict
 local Runtime = require(script.Parent.runtime)
+local Log = require(script.Parent.Parent.tooling.log)
 
 export type Context<T> = {
     read:    (self: Context<T>) -> T,
@@ -25,7 +26,7 @@ local function context<T>(default: T): Context<T>
     function ctx:provide<R...>(value: T, fn: () -> R...): R...
         local owner = Runtime.owner
         if not owner then
-            error("[shARKlib] context:provide() requires a reactive scope", 2)
+            error(Log.message("context", "provide", "requires a reactive scope"), 2)
         end
         local map = owner.context
         if not map then

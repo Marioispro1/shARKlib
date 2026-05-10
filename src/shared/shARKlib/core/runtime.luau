@@ -1,4 +1,6 @@
 --!strict
+local Log = require(script.Parent.Parent.tooling.log)
+
 export type CleanupFn = () -> ()
 
 export type Node = {
@@ -36,7 +38,7 @@ Runtime.queue  = {} :: { Node }
 Runtime.queued = {} :: { [Node]: true }
 
 Runtime.onError = function(err: any)
-    task.spawn(error, "[shARKlib] uncaught error: " .. tostring(err))
+    task.spawn(error, Log.message("runtime", "onError", "uncaught error: " .. tostring(err)))
 end
 
 Runtime.strict   = false

@@ -1,6 +1,7 @@
 --!strict
 local Graph   = require(script.Parent.Parent.core.graph)
 local Runtime = require(script.Parent.Parent.core.runtime)
+local Log = require(script.Parent.Parent.tooling.log)
 
 type Node = Runtime.Node
 
@@ -35,7 +36,7 @@ local function makeStore<T>(initial: T)
             return wrap(v, path)
         end,
         __newindex = function()
-            error("[shARKlib] store proxies are read-only; use store:set", 2)
+            error(Log.message("data.store", "write", "store proxies are read-only; use store:set"), 2)
         end,
         __iter = function(self)
             local raw = rawget(self, "__raw")
@@ -71,7 +72,7 @@ local function makeStore<T>(initial: T)
             cursor = cursor[p]
             key = key .. "." .. tostring(p)
             if type(cursor) ~= "table" then
-                error("[shARKlib] store:set path traverses non-table", 2)
+                error(Log.message("data.store", "set", "path traverses non-table"), 2)
             end
         end
         local last = path[#path]

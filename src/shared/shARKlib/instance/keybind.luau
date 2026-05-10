@@ -2,6 +2,7 @@
 local UserInputService = game:GetService("UserInputService")
 
 local Runtime = require(script.Parent.Parent.core.runtime)
+local Log = require(script.Parent.Parent.tooling.log)
 
 type Opts = { gameProcessed: boolean?, ended: boolean? }
 
@@ -17,7 +18,7 @@ local function keybind(key: Enum.KeyCode, fn: (input: InputObject) -> (), opts: 
     if Runtime.owner then
         table.insert(Runtime.owner.cleanups, function() conn:Disconnect() end)
     else
-        warn("[shARKlib] keybind called outside of a reactive scope; never disposed")
+        Log.warn("instance.keybind", "bind", "called outside of a reactive scope; never disposed")
     end
     return function() conn:Disconnect() end
 end

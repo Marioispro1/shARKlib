@@ -1,6 +1,7 @@
 --!strict
 local apply = require(script.instance.apply)
 local Templates = require(script.instance.templates)
+local Log = require(script.tooling.log)
 
 local M = {}
 
@@ -11,6 +12,8 @@ local M = {}
 -- settemplate(map)        merges into the unnamed (default) template
 -- settemplate(name, map)  merges into a named template
 function M.SetTemplate(arg1: any, arg2: any?)
+	local hasVariant = if arg2 ~= nil then "true" else "false"
+	Log.info("init", "SetTemplate", ("template set (named variant=%s)"):format(Log.braced(hasVariant)))
 	Templates.set(arg1, arg2)
 end
 
@@ -21,7 +24,7 @@ end
 
 local function requireInit()
 	if not Templates.isInitialized() then
-		error("[shARKlib] call shARKlib.Init() before using this API", 3)
+		error(Log.message("init", "requireInit", "call shARKlib.Init() before using this API"), 3)
 	end
 end
 
@@ -92,7 +95,7 @@ local function lazyLoad(name: string): any
 	end
 	local path = moduleMap[name]
 	if not path then
-		error("[shARKlib] no module named " .. name, 2)
+		error(Log.message("init", "lazyLoad", "no module named " .. name), 2)
 	end
 	local mod = require(script[path[1]][path[2]])
 	cached[name] = mod
@@ -179,4 +182,3 @@ M.scheduler = setmetatable({}, {
 })
 
 return M
-
