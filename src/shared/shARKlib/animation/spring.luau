@@ -4,6 +4,7 @@ local RunService = game:GetService("RunService")
 local Graph = require(script.Parent.Parent.core.graph)
 local Runtime = require(script.Parent.Parent.core.runtime)
 local source = require(script.Parent.Parent.core.source)
+local untrack = require(script.Parent.Parent.core.untrack)
 
 ----------------------------------------------------------------------
 -- value <-> component vector helpers
