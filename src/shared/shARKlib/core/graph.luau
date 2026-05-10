@@ -106,6 +106,9 @@ Graph.disposeChildren = disposeChildren
 
 -- register a dependency from the current scope to `node`.
 function Graph.track(node: Node)
+	if node.state == Runtime.STATE_DISPOSED then
+		return
+	end
 	local cur = Runtime.current
 	if cur and not Runtime.untracked and cur.state ~= Runtime.STATE_DISPOSED then
 		if not table.find(cur.sources, node) then
@@ -184,7 +187,7 @@ function Graph.run(node: Node)
 	end
 
 	local prevValue = node.value
-	local equals = node.equals or defaultEquals
+	local equals = node.equals :: (any, any) -> boolean
 	node.value = result
 	if not equals(prevValue, result) then
 		local observers = node.observers
@@ -203,7 +206,7 @@ function Graph.write(node: Node, value: any)
 	if node.state == Runtime.STATE_DISPOSED then
 		return value
 	end
-	local equals = node.equals or defaultEquals
+	local equals = node.equals :: (any, any) -> boolean
 	if equals(node.value, value) then
 		return value
 	end
@@ -281,4 +284,3 @@ end
 Graph.flush = flushQueue
 
 return Graph
-

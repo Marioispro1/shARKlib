@@ -53,11 +53,7 @@ function addChild(parent: Instance, child: any)
 	elseif t == "table" then
 		if (child :: any).__sparkAction then
 			-- actions in child position attach to the parent
-			local action = child :: any
-			if Runtime.owner then
-				table.insert(Runtime.owner.cleanups, function() end)
-			end
-			action.run(parent)
+			(child :: any).run(parent)
 		else
 			addChildren(parent, child :: { any })
 		end
@@ -177,4 +173,3 @@ local M = {}
 M.apply = apply
 M.Children = Children
 return M
-

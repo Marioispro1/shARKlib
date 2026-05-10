@@ -67,6 +67,7 @@ type Entry = {
 	kind: string,
 	output: any, -- source setter
 	alive: boolean,
+	inActive: boolean,
 }
 
 local active: { Entry } = {}
@@ -84,6 +85,7 @@ local function step(dt: number)
 			local last = #active
 			active[i] = active[last]
 			active[last] = nil
+			e.inActive = false
 		else
 			local omega = 2 * math.pi / e.period
 			local zeta = e.damping
@@ -134,7 +136,7 @@ local function spring<T>(target: () -> T, period: number?, damping: number?): ()
 	period = period or 0.4
 	damping = damping or 1
 
-	local initial = target()
+	local initial = untrack(target)
 	local parts, kind = decompose(initial)
 	local out = source(initial)
 
@@ -147,6 +149,7 @@ local function spring<T>(target: () -> T, period: number?, damping: number?): ()
 		kind = kind,
 		output = out,
 		alive = false,
+		inActive = false,
 	}
 
 	-- track changes to the target source
@@ -157,7 +160,8 @@ local function spring<T>(target: () -> T, period: number?, damping: number?): ()
 			entry.target = newParts
 			entry.alive = true
 			ensureDriver()
-			if not table.find(active, entry) then
+			if not entry.inActive then
+				entry.inActive = true
 				table.insert(active, entry)
 			end
 			return nil
@@ -176,4 +180,3 @@ local function spring<T>(target: () -> T, period: number?, damping: number?): ()
 end
 
 return spring
-
