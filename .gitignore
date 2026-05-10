@@ -6,3 +6,7 @@
 /*.rbxl.lock
 
 sourcemap.json
+
+# ignore the .rbxm files
+# since they'll be available in releases
+/*.rbxm
