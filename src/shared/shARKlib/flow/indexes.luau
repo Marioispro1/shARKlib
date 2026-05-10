@@ -24,7 +24,7 @@ local function indexes<T>(list: () -> { T }, component: (() -> T, number) -> any
 				else
 					local sig: any = nil
 					local rendered: any = nil
-					local destroy: (() -> ())? = nil
+					local destroy: (() -> ())?= nil
 					local indexAtCreate = i
 					root(function(d: () -> ())
 						destroy = d
