@@ -24,3 +24,4 @@ local function show<T>(cond: () -> any, component: () -> T, fallback: (() -> T)?
 end
 
 return show
+

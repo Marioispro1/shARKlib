@@ -26,3 +26,4 @@ python -m http.server -d docs 8080
 - `api.html`   — full API reference.
 - `style.css`  — shared theme.
 - `_sidebar.js` — shared sidebar markup (injected into `<div id="sidebar-mount"></div>`).
+

@@ -130,3 +130,4 @@ window.addEventListener("hashchange", updateActive);
 window.addEventListener("popstate", updateActive);
 
 if (window.hljs) hljs.highlightAll();
+

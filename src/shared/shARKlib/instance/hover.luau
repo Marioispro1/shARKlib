@@ -17,3 +17,4 @@ local function hover(): (any, () -> boolean)
 end
 
 return hover
+

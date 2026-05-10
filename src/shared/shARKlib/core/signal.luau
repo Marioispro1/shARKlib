@@ -67,3 +67,4 @@ local function signal<T...>(): Signal<T...>
 end
 
 return signal
+

@@ -176,3 +176,4 @@ local function spring<T>(target: () -> T, period: number?, damping: number?): ()
 end
 
 return spring
+

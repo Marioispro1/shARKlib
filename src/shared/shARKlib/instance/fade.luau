@@ -49,3 +49,4 @@ local function fade(opts: Opts?)
 end
 
 return fade
+

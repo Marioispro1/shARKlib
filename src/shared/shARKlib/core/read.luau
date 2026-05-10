@@ -7,3 +7,4 @@ local function read<T>(value: T | (() -> T)): T
 end
 
 return read
+

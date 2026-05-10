@@ -10,3 +10,4 @@ local function lazy<T>(loader: () -> (() -> T)): () -> T
 end
 
 return lazy
+

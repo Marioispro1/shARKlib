@@ -31,3 +31,4 @@ local function switch<K>(source: () -> K)
 end
 
 return switch
+

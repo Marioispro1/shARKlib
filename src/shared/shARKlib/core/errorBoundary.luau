@@ -25,3 +25,4 @@ local function errorBoundary(try: () -> any, fallback: (any, () -> ()) -> any): 
 end
 
 return errorBoundary
+

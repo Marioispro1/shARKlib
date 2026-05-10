@@ -20,3 +20,4 @@ local function mount(component: () -> (Instance | { Instance }), parent: Instanc
 end
 
 return mount
+

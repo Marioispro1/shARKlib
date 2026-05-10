@@ -55,3 +55,4 @@ local function resource<T>(fetcher: () -> T): (() -> T?, ResourceStatus)
 end
 
 return resource
+

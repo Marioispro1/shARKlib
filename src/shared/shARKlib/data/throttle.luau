@@ -40,3 +40,4 @@ local function throttle<T>(input: () -> T, interval: number): () -> T
 end
 
 return throttle
+

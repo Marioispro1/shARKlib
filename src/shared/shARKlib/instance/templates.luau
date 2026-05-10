@@ -129,3 +129,4 @@ function Templates.isInitialized(): boolean
 end
 
 return Templates
+

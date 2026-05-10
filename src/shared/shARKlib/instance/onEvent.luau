@@ -16,3 +16,4 @@ local function onEvent(name: string, fn: (...any) -> ())
 end
 
 return onEvent
+

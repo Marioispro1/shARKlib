@@ -24,3 +24,4 @@ local function mapList<T, R>(list: () -> { T }, fn: (T, number) -> R): () -> { R
 end
 
 return mapList
+

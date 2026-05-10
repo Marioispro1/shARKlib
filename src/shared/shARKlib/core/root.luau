@@ -37,3 +37,4 @@ local function root<T...>(fn: (destroy: () -> ()) -> T...): T...
 end
 
 return root
+

@@ -23,3 +23,4 @@ local function keybind(key: Enum.KeyCode, fn: (input: InputObject) -> (), opts: 
 end
 
 return keybind
+

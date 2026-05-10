@@ -73,3 +73,4 @@ local function indexes<T>(list: () -> { T }, component: (() -> T, number) -> any
 end
 
 return indexes
+

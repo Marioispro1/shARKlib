@@ -8,3 +8,4 @@ local function ref<T>(target: ((Instance) -> ()) | ((T?) -> T))
 end
 
 return ref
+

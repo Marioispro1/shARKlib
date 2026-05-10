@@ -22,3 +22,4 @@ local function create(target: string | Instance, templateName: string?): (Props)
 end
 
 return create
+

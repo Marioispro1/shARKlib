@@ -14,3 +14,4 @@ local function batch<T>(fn: () -> T): T
 end
 
 return batch
+

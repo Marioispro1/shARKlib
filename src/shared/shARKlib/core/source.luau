@@ -18,3 +18,4 @@ local function source<T>(initial: T, equals: ((T, T) -> boolean)?): Source<T>
 end
 
 return source
+

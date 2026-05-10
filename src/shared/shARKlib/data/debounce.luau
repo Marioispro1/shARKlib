@@ -28,3 +28,4 @@ local function debounce<T>(input: () -> T, delay: number): () -> T
 end
 
 return debounce
+

@@ -281,3 +281,4 @@ end
 Graph.flush = flushQueue
 
 return Graph
+

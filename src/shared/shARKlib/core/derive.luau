@@ -10,3 +10,4 @@ local function derive<T>(fn: () -> T, equals: ((T, T) -> boolean)?): () -> T
 end
 
 return derive
+

@@ -7,3 +7,4 @@ local function effect(fn: () -> ())
 end
 
 return effect
+

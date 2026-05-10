@@ -14,3 +14,4 @@ local function action(fn: (Instance) -> (), priority: number?): Action
 end
 
 return action
+
